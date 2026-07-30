@@ -236,7 +236,7 @@ export default function RegistrationForm() {
             <span className="text-amber-gradient">قبل ما ينتهي</span>
           </h2>
           <p className="text-white/55 text-lg max-w-xl mx-auto leading-relaxed">
-            المقاعد محدودة في كل موعد — احجز الآن وسيتواصل معك فريقنا خلال 24 ساعة
+            احجز الآن وسيتواصل معك فريقنا خلال 24 ساعة
           </p>
         </div>
 
@@ -395,19 +395,6 @@ export default function RegistrationForm() {
                           color: isSelected ? '#FCD34D' : '#E5E7EB',
                           lineHeight: 1.2,
                         }}>{group.label}</span>
-                        {!schedulesLoading && (
-                          <span style={{
-                            fontSize: '0.72rem',
-                            fontWeight: 800,
-                            color: group.occupied >= 30 ? '#EF4444' : '#10B981',
-                            background: group.occupied >= 30 ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)',
-                            border: `1px solid ${group.occupied >= 30 ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}`,
-                            borderRadius: 9999,
-                            padding: '0.2rem 0.7rem',
-                          }}>
-                            {group.occupied >= 30 ? 'مكتملة (30/30)' : `${group.occupied} / 30 محجوز`}
-                          </span>
-                        )}
                       </button>
                     );
                   })}
@@ -495,19 +482,6 @@ export default function RegistrationForm() {
                                   }}>
                                     {schedule.time_display}
                                   </span>
-
-                                  {/* Seats */}
-                                  {isFull ? (
-                                    <span style={{ fontSize: '0.65rem', color: '#EF4444', fontWeight: 700 }}>مكتمل (30/30)</span>
-                                  ) : (
-                                    <span style={{
-                                      fontSize: '0.68rem',
-                                      fontWeight: 800,
-                                      color: isSelected ? '#F59E0B' : '#34D399',
-                                    }}>
-                                      {schedule.occupied_seats || 0} / 30 محجوز
-                                    </span>
-                                  )}
 
                                   {/* Selected tick */}
                                   {isSelected && (
