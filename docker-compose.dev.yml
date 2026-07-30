@@ -1,0 +1,83 @@
+version: '3.8'
+
+# ==============================================================================
+# Egyptian Programming Academy Platform - Development Docker Compose Override
+# ==============================================================================
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+# ==============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Database Service (Dev Override: Expose port for local tools like DBeaver/pgAdmin)
+  # ---------------------------------------------------------------------------
+  db:
+    ports:
+      - "5432:5432"
+
+  # ---------------------------------------------------------------------------
+  # Redis Service (Dev Override: Expose port for Redis GUI or redis-cli)
+  # ---------------------------------------------------------------------------
+  redis:
+    ports:
+      - "6379:6379"
+
+  # ---------------------------------------------------------------------------
+  # Django Backend Service (Dev Override: Hot Reload via runserver)
+  # ---------------------------------------------------------------------------
+  backend:
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - DEBUG=True
+      - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+    volumes:
+      - ./backend:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+
+  # ---------------------------------------------------------------------------
+  # Celery Worker (Dev Override: Mount code for real-time task updates)
+  # ---------------------------------------------------------------------------
+  celery:
+    command: celery -A core worker -l info --autoreload
+    environment:
+      - DEBUG=True
+    volumes:
+      - ./backend:/app
+      - media_volume:/app/media
+
+  # ---------------------------------------------------------------------------
+  # Celery Beat Scheduler (Dev Override: Mount code)
+  # ---------------------------------------------------------------------------
+  celery-beat:
+    command: celery -A core beat -l info
+    environment:
+      - DEBUG=True
+    volumes:
+      - ./backend:/app
+
+  # ---------------------------------------------------------------------------
+  # Next.js Frontend Service (Dev Override: Hot Reload via npm run dev)
+  # ---------------------------------------------------------------------------
+  frontend:
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000/ws
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+
+  # ---------------------------------------------------------------------------
+  # Nginx Service (Dev Override)
+  # ---------------------------------------------------------------------------
+  nginx:
+    ports:
+      - "80:80"

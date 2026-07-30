@@ -1,0 +1,86 @@
+# ==========================================
+# 🐝 Bee Code Platform — Master Git Ignore
+# ==========================================
+
+# ── Environment & Secrets (NEVER COMMIT) ──
+.env
+.env.*
+!.env.example
+*.env
+*.pem
+*.key
+*.cert
+*.pfx
+
+# ── Node.js & Next.js Frontend ──
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+out/
+frontend/out/
+build/
+frontend/build/
+dist/
+frontend/dist/
+.next-boost/
+.vercel/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# ── Service Worker & PWA Build Outputs ──
+frontend/public/sw.js
+frontend/public/sw.js.map
+frontend/public/workbox-*.js
+frontend/public/workbox-*.js.map
+
+# ── Python & Django Backend ──
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*.py[cod]
+*$py.class
+venv/
+backend/venv/
+.venv/
+backend/.venv/
+env/
+backend/env/
+ENV/
+env.bak/
+venv.bak/
+
+# ── Databases & Dynamic Media Uploads ──
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+backend/db.sqlite3
+media/
+backend/media/
+staticfiles/
+backend/staticfiles/
+
+# ── Logs & Celery ──
+logs/
+*.log
+celerybeat-schedule
+celerybeat.pid
+
+# ── Operating System & IDE Files ──
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
