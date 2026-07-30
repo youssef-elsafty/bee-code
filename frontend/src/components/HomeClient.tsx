@@ -6,7 +6,6 @@ import HeroSection from '@/components/sections/HeroSection';
 import WhyChooseUs from '@/components/sections/WhyChooseUs';
 import CourseBenefits from '@/components/sections/CourseBenefits';
 import ChallengeTimeline from '@/components/sections/ChallengeTimeline';
-import Testimonials from '@/components/sections/Testimonials';
 import FAQ from '@/components/sections/FAQ';
 import ContactSection from '@/components/sections/ContactSection';
 import RegistrationForm from '@/components/sections/RegistrationForm';
@@ -32,7 +31,6 @@ export default function HomeClient() {
         <WhyChooseUs />
         <CourseBenefits />
         <ChallengeTimeline />
-        <Testimonials />
         <RegistrationForm />
         <FAQ />
         <ContactSection />
