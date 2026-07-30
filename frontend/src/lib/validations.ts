@@ -28,11 +28,13 @@ export const registrationSchema = z.object({
     .or(z.literal('')),
   school: z
     .string()
-    .min(3, 'اسم المدرسة مطلوب')
-    .max(150, 'اسم المدرسة طويل جداً'),
+    .max(150, 'اسم المدرسة طويل جداً')
+    .optional()
+    .or(z.literal('')),
   governorate: z
     .string()
-    .min(1, 'المحافظة مطلوبة'),
+    .optional()
+    .or(z.literal('')),
   grade: z
     .string()
     .min(1, 'الصف الدراسي مطلوب'),

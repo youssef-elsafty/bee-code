@@ -77,6 +77,8 @@ export default function RegistrationForm() {
     mode: 'onChange',
     defaultValues: {
       grade: GRADES[0],
+      governorate: 'القليوبية',
+      school: '',
       agreement: false,
     },
   });
@@ -317,16 +319,16 @@ export default function RegistrationForm() {
               </FieldWrapper>
 
               {/* School */}
-              <FieldWrapper label="المدرسة" error={errors.school?.message} required icon={<School size={14} className="text-amber-400" />}>
+              <FieldWrapper label="المدرسة (اختياري)" error={errors.school?.message} icon={<School size={14} className="text-amber-400" />}>
                 <input
                   {...register('school')}
-                  placeholder="اسم المدرسة"
+                  placeholder="اسم المدرسة (اختياري)"
                   className="w-full px-4 py-3.5 rounded-xl bg-slate-900/60 border border-white/10 text-white placeholder-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all text-sm font-cairo"
                 />
               </FieldWrapper>
 
               {/* Governorate */}
-              <FieldWrapper label="المحافظة" error={errors.governorate?.message} required icon={<MapPin size={14} className="text-amber-400" />}>
+              <FieldWrapper label="المحافظة (اختياري)" error={errors.governorate?.message} icon={<MapPin size={14} className="text-amber-400" />}>
                 <Controller
                   name="governorate"
                   control={control}

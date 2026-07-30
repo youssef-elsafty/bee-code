@@ -7,8 +7,8 @@ class Student(models.Model):
     phone = models.CharField(max_length=20)
     whatsapp = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
-    school = models.CharField(max_length=255)
-    governorate = models.CharField(max_length=100)
+    school = models.CharField(max_length=255, blank=True, default='')
+    governorate = models.CharField(max_length=100, blank=True, default='القليوبية')
     grade = models.CharField(max_length=50)
 
     created_at = models.DateTimeField(auto_now_add=True)
