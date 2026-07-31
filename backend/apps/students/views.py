@@ -2,6 +2,8 @@ from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
+from django.db.models import F
+
 from .models import Student, Schedule, Registration
 from .serializers import (
     StudentSerializer, ScheduleSerializer, RegistrationSerializer, 
@@ -11,14 +13,13 @@ from apps.accounts.permissions import IsStaffOrAdmin
 from .filters import StudentFilter, RegistrationFilter, ScheduleFilter
 
 class PublicScheduleViewSet(generics.ListAPIView):
-    queryset = Schedule.objects.filter(is_active=True)
     serializer_class = ScheduleSerializer
     permission_classes = [AllowAny]
     filterset_class = ScheduleFilter
 
     def get_queryset(self):
         # Only return schedules with available seats
-        return [s for s in super().get_queryset() if s.available_seats > 0]
+        return Schedule.objects.filter(is_active=True, occupied_seats__lt=F('total_seats'))
 
 class PublicRegistrationView(generics.CreateAPIView):
     serializer_class = PublicRegistrationSerializer
