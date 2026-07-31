@@ -6,8 +6,8 @@ from django.db.models import F
 
 from .models import Student, Schedule, Registration
 from .serializers import (
-    StudentSerializer, ScheduleSerializer, RegistrationSerializer, 
-    PublicRegistrationSerializer
+    StudentSerializer, AdminStudentSerializer, ScheduleSerializer,
+    RegistrationSerializer, PublicRegistrationSerializer
 )
 from apps.accounts.permissions import IsStaffOrAdmin
 from .filters import StudentFilter, RegistrationFilter, ScheduleFilter
@@ -35,6 +35,17 @@ class PublicRegistrationView(generics.CreateAPIView):
             from django.core.mail import send_mail
             student = registration.student
             schedule = registration.schedule
+            day_map = {
+                'SAT': 'السبت والثلاثاء', 'TUE': 'السبت والثلاثاء',
+                'SUN': 'الأحد والأربعاء', 'WED': 'الأحد والأربعاء',
+            }
+            day_label = day_map.get(schedule.day, schedule.get_day_display())
+            h = schedule.time.hour
+            m = schedule.time.minute
+            period = 'مساءً' if h >= 12 else 'صباحاً'
+            dh = h if h <= 12 else h - 12
+            dh = dh or 12
+            time_label = f"{dh}:{m:02d} {period}"
             subject = f"🚨 حجز جديد في الأكاديمية: {student.full_name}"
             message = (
                 f"تم استلام طلب حجز جديد:\n\n"
@@ -45,7 +56,7 @@ class PublicRegistrationView(generics.CreateAPIView):
                 f"📍 المحافظة: {student.governorate}\n"
                 f"🏫 المدرسة: {student.school}\n"
                 f"🎓 المسار الدراسي: {student.grade}\n"
-                f"⏰ الموعد المختار: {schedule.day_display} — {schedule.time_display}\n"
+                f"⏰ الموعد المختار: {day_label} — {time_label}\n"
             )
             send_mail(
                 subject,
@@ -65,7 +76,7 @@ class PublicRegistrationView(generics.CreateAPIView):
 # Admin Views
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by('-created_at')
-    serializer_class = StudentSerializer
+    serializer_class = AdminStudentSerializer
     permission_classes = [IsStaffOrAdmin]
     filterset_class = StudentFilter
 

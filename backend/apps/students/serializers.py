@@ -1,12 +1,30 @@
 from rest_framework import serializers
 from .models import Student, Schedule, Registration
 from django.db import transaction
-from django.core.exceptions import ValidationError
+
+
+# ── Student Serializers ──────────────────────────────────────────
 
 class StudentSerializer(serializers.ModelSerializer):
+    """Used for PUBLIC registration — only writable fields."""
+    email = serializers.EmailField(required=False, allow_null=True, allow_blank=True)
+    school = serializers.CharField(required=False, allow_blank=True, default='')
+    governorate = serializers.CharField(required=False, allow_blank=True, default='القليوبية')
+    whatsapp = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+
+    class Meta:
+        model = Student
+        fields = ['full_name', 'parent_name', 'phone', 'whatsapp', 'email', 'school', 'governorate', 'grade']
+
+
+class AdminStudentSerializer(serializers.ModelSerializer):
+    """Used for ADMIN reads — includes id and timestamps."""
     class Meta:
         model = Student
         fields = '__all__'
+
+
+# ── Schedule Serializer ──────────────────────────────────────────
 
 class ScheduleSerializer(serializers.ModelSerializer):
     available_seats = serializers.ReadOnlyField()
@@ -17,7 +35,10 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = '__all__'
+        fields = [
+            'id', 'day', 'time', 'total_seats', 'occupied_seats', 'is_active',
+            'available_seats', 'day_display', 'time_display', 'day_of_week', 'is_full',
+        ]
 
     def get_day_display(self, obj):
         mapping = {
@@ -51,9 +72,14 @@ class ScheduleSerializer(serializers.ModelSerializer):
     def get_is_full(self, obj):
         return obj.available_seats <= 0
 
+
+# ── Registration Serializers ─────────────────────────────────────
+
 class RegistrationSerializer(serializers.ModelSerializer):
-    student = StudentSerializer(read_only=True)
+    """Used by Admin ViewSet — full nested read, PK write."""
+    student = AdminStudentSerializer(read_only=True)
     schedule = ScheduleSerializer(read_only=True)
+    registered_at = serializers.DateTimeField(source='created_at', read_only=True)
     student_id = serializers.PrimaryKeyRelatedField(
         queryset=Student.objects.all(), source='student', write_only=True
     )
@@ -63,10 +89,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Registration
-        fields = '__all__'
-        
+        fields = ['id', 'student', 'schedule', 'status', 'notes', 'registered_at', 'updated_at',
+                  'student_id', 'schedule_id']
+
     def validate(self, data):
-        # Allow validation for creation
         schedule = data.get('schedule')
         if not self.instance and schedule:
             if schedule.available_seats <= 0:
@@ -75,10 +101,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Schedule is not active.")
         return data
 
+
 class PublicRegistrationSerializer(serializers.Serializer):
+    """Used for PUBLIC registration endpoint."""
     student = StudentSerializer()
     schedule_id = serializers.PrimaryKeyRelatedField(
-        queryset=Schedule.objects.filter(is_active=True), 
+        queryset=Schedule.objects.filter(is_active=True),
         write_only=True
     )
 
@@ -93,10 +121,12 @@ class PublicRegistrationSerializer(serializers.Serializer):
         schedule = validated_data.pop('schedule_id')
 
         student = Student.objects.create(**student_data)
-        
-        # Increase occupied seats
-        schedule.occupied_seats += 1
-        schedule.save()
+
+        # Increase occupied seats atomically
+        Schedule.objects.filter(pk=schedule.pk).update(
+            occupied_seats=schedule.occupied_seats + 1
+        )
+        schedule.refresh_from_db()
 
         registration = Registration.objects.create(
             student=student,
