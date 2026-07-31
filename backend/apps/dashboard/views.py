@@ -47,9 +47,20 @@ class DashboardStatsView(views.APIView):
 
         # Registrations by schedule
         registrations_by_schedule = []
+        day_map = {
+            'SAT': 'السبت والثلاثاء', 'TUE': 'السبت والثلاثاء',
+            'SUN': 'الأحد والأربعاء', 'WED': 'الأحد والأربعاء',
+        }
         for s in schedules:
+            day_lbl = day_map.get(s.day, s.get_day_display())
+            h = s.time.hour
+            m = s.time.minute
+            period = 'مساءً' if h >= 12 else 'صباحاً'
+            dh = h if h <= 12 else h - 12
+            dh = dh or 12
+            time_lbl = f"{dh}:{m:02d} {period}"
             registrations_by_schedule.append({
-                'schedule_label': f"{s.day_display} {s.time_display}",
+                'schedule_label': f"{day_lbl} {time_lbl}",
                 'count': s.occupied_seats,
                 'available': s.available_seats
             })

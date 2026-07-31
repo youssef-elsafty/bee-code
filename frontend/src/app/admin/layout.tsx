@@ -18,15 +18,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     setMounted(true);
-    const isUserAuthed = isAuthenticated();
-    setAuthed(isUserAuthed);
 
-    if (!isUserAuthed && !isLoginPage) {
+    // Read token from cookies OR localStorage
+    const hasToken =
+      isAuthenticated() ||
+      (typeof window !== 'undefined' &&
+        !!(localStorage.getItem('access_token')));
+
+    setAuthed(hasToken);
+
+    if (!hasToken && !isLoginPage) {
       router.replace('/admin/login');
     }
   }, [pathname, isLoginPage, router]);
 
-  // Prevent hydration mismatch by rendering empty frame until mounted on client
+  // Prevent hydration mismatch
   if (!mounted) {
     return (
       <div style={{ minHeight: '100vh', background: '#070809' }} />

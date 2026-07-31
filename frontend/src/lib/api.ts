@@ -158,9 +158,12 @@ export const studentsApi = {
   registrations: async (params?: Record<string, unknown>) => {
     try {
       const res = await api.get('/admin/registrations/', { params });
+      if (Array.isArray(res.data)) {
+        return { data: { results: res.data, count: res.data.length } };
+      }
       if (res.data?.results !== undefined) return res;
-    } catch {
-      // Fallback to local store
+    } catch (err) {
+      console.error('Error fetching registrations from API:', err);
     }
     const all = getLocalRegistrations();
     let filtered = all;
@@ -225,6 +228,9 @@ export const notificationsApi = {
   list: async (params?: Record<string, unknown>) => {
     try {
       const res = await api.get('/admin/notifications/', { params });
+      if (Array.isArray(res.data)) {
+        return { data: { results: res.data, count: res.data.length } };
+      }
       if (res.data?.results) return res;
     } catch {
       // Fallback

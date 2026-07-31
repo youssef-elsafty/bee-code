@@ -36,21 +36,18 @@ export default function AdminLoginPage() {
     setIsLoading(true);
     try {
       const response = await authApi.login(data);
-      saveTokens({ access: response.data.access, refresh: response.data.refresh });
+      const { access, refresh } = response.data;
+      saveTokens({ access, refresh });
       toast.success('تم تسجيل الدخول بنجاح 🐝');
-      router.replace('/admin/dashboard');
-    } catch {
-      // Demo fallback — remove in production
-      if (
-        data.username === 'admin' ||
-        data.username === 'youssef' ||
-        data.password === 'admin123'
-      ) {
-        saveTokens({ access: 'demo-access-token', refresh: 'demo-refresh-token' });
-        toast.success('تم تسجيل الدخول 🐝');
-        router.replace('/admin/dashboard');
-      } else {
+      // Hard navigation ensures tokens are read fresh on next page load
+      window.location.href = '/admin/dashboard';
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 401 || status === 400) {
         toast.error('اسم المستخدم أو كلمة المرور غير صحيحة');
+      } else {
+        // Network/server error — try connecting to Render (cold start may take 30s)
+        toast.error('تعذّر الاتصال بالخادم، انتظر لحظة ثم أعد المحاولة...');
       }
     } finally {
       setIsLoading(false);
