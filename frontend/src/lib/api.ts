@@ -137,7 +137,7 @@ export const studentsApi = {
   registrations: async (params?: Record<string, unknown>) => {
     try {
       const res = await api.get('/admin/registrations/', { params });
-      if (res.data?.results && res.data.results.length > 0) return res;
+      if (res.data?.results !== undefined) return res;
     } catch {
       // Fallback to local store
     }
