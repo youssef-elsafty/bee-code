@@ -34,6 +34,7 @@ export type RegistrationStatus = 'pending' | 'paid' | 'cancelled' | 'completed';
 export interface Schedule {
   id: number;
   day_of_week: DayOfWeek;
+  day?: string;
   day_display: string;
   time_slot: TimeSlot;
   time_display: string;
