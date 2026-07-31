@@ -84,9 +84,11 @@ export default function RegistrationForm() {
   });
 
   // Robust filtering: handles SAT/TUE/SAT_TUE and SUN/WED/SUN_WED from backend
+  const getDayString = (s: Schedule) => (s.day_of_week || s.day || '').toString().toUpperCase();
+
   const filteredSchedules = selectedDay
     ? schedules.filter((s: Schedule) => {
-        const day = (s.day_of_week as string).toUpperCase();
+        const day = getDayString(s);
         if (selectedDay === 'SAT_TUE') {
           return day.includes('SAT') || day.includes('TUE');
         }
@@ -100,14 +102,14 @@ export default function RegistrationForm() {
   // Count occupied seats per day group
   const satTueOccupied = schedules
     .filter((s: Schedule) => {
-      const d = (s.day_of_week as string).toUpperCase();
+      const d = getDayString(s);
       return d.includes('SAT') || d.includes('TUE');
     })
     .reduce((acc: number, s: Schedule) => acc + (s.occupied_seats ?? 0), 0);
 
   const sunWedOccupied = schedules
     .filter((s: Schedule) => {
-      const d = (s.day_of_week as string).toUpperCase();
+      const d = getDayString(s);
       return d.includes('SUN') || d.includes('WED');
     })
     .reduce((acc: number, s: Schedule) => acc + (s.occupied_seats ?? 0), 0);

@@ -10,10 +10,46 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class ScheduleSerializer(serializers.ModelSerializer):
     available_seats = serializers.ReadOnlyField()
-    
+    day_display = serializers.SerializerMethodField()
+    time_display = serializers.SerializerMethodField()
+    day_of_week = serializers.SerializerMethodField()
+    is_full = serializers.SerializerMethodField()
+
     class Meta:
         model = Schedule
         fields = '__all__'
+
+    def get_day_display(self, obj):
+        mapping = {
+            'SAT': 'السبت والثلاثاء',
+            'TUE': 'السبت والثلاثاء',
+            'SUN': 'الأحد والأربعاء',
+            'WED': 'الأحد والأربعاء',
+        }
+        return mapping.get(obj.day, obj.get_day_display())
+
+    def get_time_display(self, obj):
+        if not obj.time:
+            return ""
+        hour = obj.time.hour
+        minute = obj.time.minute
+        period = 'مساءً' if hour >= 12 else 'صباحاً'
+        display_hour = hour if hour <= 12 else hour - 12
+        if display_hour == 0:
+            display_hour = 12
+        return f"{display_hour}:{minute:02d} {period}"
+
+    def get_day_of_week(self, obj):
+        mapping = {
+            'SAT': 'SAT_TUE',
+            'TUE': 'SAT_TUE',
+            'SUN': 'SUN_WED',
+            'WED': 'SUN_WED',
+        }
+        return mapping.get(obj.day, obj.day)
+
+    def get_is_full(self, obj):
+        return obj.available_seats <= 0
 
 class RegistrationSerializer(serializers.ModelSerializer):
     student = StudentSerializer(read_only=True)
