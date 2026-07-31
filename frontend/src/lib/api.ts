@@ -196,7 +196,7 @@ export const dashboardApi = {
     }
     return { data: getLocalStats() };
   },
-  auditLogs: (params?: Record<string, unknown>) => api.get('/admin/audit-logs/', { params }),
+  auditLogs: (params?: Record<string, unknown>) => api.get('/admin/dashboard/audit-logs/', { params }),
 };
 
 // Admin — Notifications
@@ -219,5 +219,5 @@ export const notificationsApi = {
 // Admin — Export
 export const exportApi = {
   students: (format: 'xlsx' | 'csv' | 'pdf') =>
-    api.get(`/admin/export/students/`, { params: { format }, responseType: 'blob' }),
+    api.get(`/admin/dashboard/export/students/`, { params: { format }, responseType: 'blob' }),
 };

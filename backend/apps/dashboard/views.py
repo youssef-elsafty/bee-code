@@ -13,27 +13,72 @@ from apps.students.models import Student, Registration, Schedule
 from .models import AuditLog, SiteSetting
 from .serializers import AuditLogSerializer
 
+from django.utils import timezone
+from datetime import timedelta
+from apps.students.serializers import RegistrationSerializer
+
 class DashboardStatsView(views.APIView):
     permission_classes = [IsStaffOrAdmin]
 
     def get(self, request):
+        today = timezone.now().date()
         total_students = Student.objects.count()
-        total_registrations = Registration.objects.count()
-        total_schedules = Schedule.objects.count()
-        
-        # Breakdown by status
+        today_registrations = Registration.objects.filter(created_at__date=today).count()
+
+        schedules = Schedule.objects.all()
+        total_schedules = schedules.count()
+        total_occupied_seats = sum(s.occupied_seats for s in schedules)
+        total_available_seats = sum(s.available_seats for s in schedules)
+
+        pending_count = Registration.objects.filter(status='pending').count()
+        paid_count = Registration.objects.filter(status='paid').count()
+        cancelled_count = Registration.objects.filter(status='cancelled').count()
+        completed_count = Registration.objects.filter(status='completed').count()
+
+        # Registrations by day (last 7 days)
+        registrations_by_day = []
+        for i in range(6, -1, -1):
+            day_date = today - timedelta(days=i)
+            cnt = Registration.objects.filter(created_at__date=day_date).count()
+            registrations_by_day.append({
+                'date': day_date.strftime('%Y-%m-%d'),
+                'count': cnt
+            })
+
+        # Registrations by schedule
+        registrations_by_schedule = []
+        for s in schedules:
+            registrations_by_schedule.append({
+                'schedule_label': f"{s.day_display} {s.time_display}",
+                'count': s.occupied_seats,
+                'available': s.available_seats
+            })
+
+        # Recent registrations (last 5)
+        recent_qs = Registration.objects.select_related('student', 'schedule').order_by('-created_at')[:5]
+        recent_data = RegistrationSerializer(recent_qs, many=True).data
+
         registrations_by_status = {
-            'pending': Registration.objects.filter(status='pending').count(),
-            'paid': Registration.objects.filter(status='paid').count(),
-            'cancelled': Registration.objects.filter(status='cancelled').count(),
-            'completed': Registration.objects.filter(status='completed').count(),
+            'pending': pending_count,
+            'paid': paid_count,
+            'cancelled': cancelled_count,
+            'completed': completed_count,
         }
 
         return Response({
             'total_students': total_students,
-            'total_registrations': total_registrations,
+            'today_registrations': today_registrations,
+            'total_occupied_seats': total_occupied_seats,
+            'total_available_seats': total_available_seats,
             'total_schedules': total_schedules,
-            'registrations_by_status': registrations_by_status
+            'paid_count': paid_count,
+            'pending_count': pending_count,
+            'cancelled_count': cancelled_count,
+            'completed_count': completed_count,
+            'registrations_by_day': registrations_by_day,
+            'registrations_by_schedule': registrations_by_schedule,
+            'recent_registrations': recent_data,
+            'registrations_by_status': registrations_by_status,
         })
 
 class ExportStudentsView(views.APIView):
