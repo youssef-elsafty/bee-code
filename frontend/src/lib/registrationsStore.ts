@@ -91,8 +91,8 @@ export function saveLocalRegistration(newReg: {
   parent_name: string;
   phone: string;
   whatsapp: string;
-  school: string;
-  governorate: string;
+  school?: string;
+  governorate?: string;
   grade?: string;
   email?: string;
   schedule_id: number;
@@ -118,8 +118,8 @@ export function saveLocalRegistration(newReg: {
       phone: newReg.phone,
       whatsapp: newReg.whatsapp,
       email: newReg.email || '',
-      school: newReg.school,
-      governorate: newReg.governorate,
+      school: newReg.school || '',
+      governorate: newReg.governorate || '',
       grade: newReg.grade || 'مسار الهندسة وعلوم الحاسب — بكالوريا مصرية',
       created_at: now,
     },

@@ -33,7 +33,6 @@ export default function Footer() {
     { label: 'لماذا Bee Code', href: '#why' },
     { label: 'المنهج الكامل', href: '#challenge' },
     { label: 'مكتسبات الطالب', href: '#benefits' },
-    { label: 'آراء الطلاب', href: '#testimonials' },
     { label: 'الأسئلة الشائعة', href: '#faq' },
   ];
 

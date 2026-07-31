@@ -10,7 +10,6 @@ const NAV_LINKS = [
   { label: 'المدرب', href: '#about' },
   { label: 'المنهج', href: '#challenge' },
   { label: 'المكتسبات', href: '#benefits' },
-  { label: 'آراء الطلاب', href: '#testimonials' },
   { label: 'الأسئلة الشائعة', href: '#faq' },
 ];
 
