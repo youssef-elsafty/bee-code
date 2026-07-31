@@ -21,6 +21,20 @@ for day, t, seats in schedules:
     Schedule.objects.get_or_create(day=day, time=t, defaults={'total_seats': seats})
 "
 
+echo "Ensure default admin user exists"
+python manage.py shell --settings=config.settings.production -c "
+from apps.accounts.models import CustomUser
+if not CustomUser.objects.filter(username='admin').exists():
+    CustomUser.objects.create_superuser('admin', 'admin@beecode.com', 'admin123', role='superadmin')
+    print('Admin user created.')
+else:
+    u = CustomUser.objects.get(username='admin')
+    u.set_password('admin123')
+    u.role = 'superadmin'
+    u.save()
+    print('Admin user updated.')
+"
+
 echo "Collect static files"
 python manage.py collectstatic --settings=config.settings.production --noinput
 
