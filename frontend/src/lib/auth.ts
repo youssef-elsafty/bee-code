@@ -15,18 +15,23 @@ export function saveTokens(tokens: AuthTokens): void {
   Cookies.set('access_token', tokens.access, { ...COOKIE_OPTIONS, expires: 1 });
   // Refresh token: 7 days
   Cookies.set('refresh_token', tokens.refresh, { ...COOKIE_OPTIONS, expires: 7 });
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('access_token', tokens.access);
+    localStorage.setItem('refresh_token', tokens.refresh);
+  }
 }
 
 export function getAccessToken(): string | undefined {
-  return Cookies.get('access_token');
+  return Cookies.get('access_token') || (typeof window !== 'undefined' ? localStorage.getItem('access_token') || undefined : undefined);
 }
 
 export function getRefreshToken(): string | undefined {
-  return Cookies.get('refresh_token');
+  return Cookies.get('refresh_token') || (typeof window !== 'undefined' ? localStorage.getItem('refresh_token') || undefined : undefined);
 }
 
 export function isAuthenticated(): boolean {
-  return !!Cookies.get('access_token');
+  return !!getAccessToken();
 }
 
 export async function logout(): Promise<void> {

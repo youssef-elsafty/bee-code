@@ -31,7 +31,7 @@ export const api = axios.create({
 // Request interceptor — attach access token
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = Cookies.get('access_token');
+    const token = Cookies.get('access_token') || (typeof window !== 'undefined' ? localStorage.getItem('access_token') : null);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -69,7 +69,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = Cookies.get('refresh_token');
+      const refreshToken = Cookies.get('refresh_token') || (typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null);
       if (!refreshToken) {
         clearAuthCookies();
         if (typeof window !== 'undefined') window.location.href = '/admin/login';
@@ -78,7 +78,8 @@ api.interceptors.response.use(
 
       try {
         const { data } = await publicApi.post('/auth/refresh/', { refresh: refreshToken });
-        Cookies.set('access_token', data.access, { expires: 1, secure: true, sameSite: 'strict' });
+        Cookies.set('access_token', data.access, { expires: 1, sameSite: 'lax' });
+        if (typeof window !== 'undefined') localStorage.setItem('access_token', data.access);
         api.defaults.headers.common.Authorization = `Bearer ${data.access}`;
         processQueue(null, data.access);
         originalRequest.headers.Authorization = `Bearer ${data.access}`;
@@ -100,6 +101,10 @@ api.interceptors.response.use(
 export function clearAuthCookies() {
   Cookies.remove('access_token');
   Cookies.remove('refresh_token');
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+  }
 }
 
 // ── API endpoint functions ────────────────────────────────────
