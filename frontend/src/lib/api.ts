@@ -11,20 +11,20 @@ import {
   getLocalStats,
 } from './registrationsStore';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bee-code.onrender.com/api/v1';
 
 // ── Public API (no auth) ──────────────────────────────────────
 export const publicApi = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 5000,
+  timeout: 30000,
 });
 
 // ── Authenticated API ─────────────────────────────────────────
 export const api = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 5000,
+  timeout: 30000,
   withCredentials: false,
 });
 

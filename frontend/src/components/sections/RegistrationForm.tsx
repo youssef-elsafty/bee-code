@@ -158,12 +158,7 @@ export default function RegistrationForm() {
         return res;
       } catch (err: any) {
         console.error('API Register Error:', err);
-        // If backend responds with status code (e.g. 400), throw it to show error toast
-        if (err.response) {
-          throw err;
-        }
-        // Fallback for standalone/local demo mode
-        return { data: { success: true } };
+        throw err;
       }
     },
     onSuccess: (_, variables) => {
