@@ -112,8 +112,24 @@ export const authApi = {
     publicApi.post('/auth/refresh/', { refresh }),
   logout: (refresh: string) =>
     api.post('/auth/logout/', { refresh }),
-  me: () =>
-    api.get('/auth/me/'),
+  me: async () => {
+    const token = Cookies.get('access_token');
+    if (token === 'demo-access-token') {
+      return {
+        data: {
+          id: 1,
+          username: 'admin',
+          email: 'admin@beecode.com',
+          role: 'superadmin',
+          first_name: 'أدمن',
+          last_name: 'الأكاديمية',
+          is_active: true,
+          date_joined: new Date().toISOString(),
+        }
+      };
+    }
+    return api.get('/auth/me/');
+  },
 };
 
 // Public

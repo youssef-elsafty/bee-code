@@ -7,7 +7,7 @@ import { authApi, clearAuthCookies } from './api';
 
 const COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict' as const,
+  sameSite: 'lax' as const,
 };
 
 export function saveTokens(tokens: AuthTokens): void {
