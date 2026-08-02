@@ -41,7 +41,7 @@ services:
   # Celery Worker (Dev Override: Mount code for real-time task updates)
   # ---------------------------------------------------------------------------
   celery:
-    command: celery -A core worker -l info --autoreload
+    command: celery -A config worker -l info --autoreload
     environment:
       - DEBUG=True
     volumes:
@@ -52,7 +52,7 @@ services:
   # Celery Beat Scheduler (Dev Override: Mount code)
   # ---------------------------------------------------------------------------
   celery-beat:
-    command: celery -A core beat -l info
+    command: celery -A config beat -l info
     environment:
       - DEBUG=True
     volumes:

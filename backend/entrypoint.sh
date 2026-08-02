@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+if [ "$1" = "gunicorn" ]; then
 echo "Apply database migrations"
 python manage.py migrate --settings=config.settings.production --noinput
 
@@ -21,22 +22,35 @@ for day, t, seats in schedules:
     Schedule.objects.get_or_create(day=day, time=t, defaults={'total_seats': seats})
 "
 
-echo "Ensure default admin user exists"
+if [ -n "${ADMIN_PASSWORD:-}" ]; then
+echo "Ensure configured admin user exists"
 python manage.py shell --settings=config.settings.production -c "
+import os
 from apps.accounts.models import CustomUser
-if not CustomUser.objects.filter(username='admin').exists():
-    CustomUser.objects.create_superuser('admin', 'admin@beecode.com', 'admin123', role='superadmin')
+username = os.environ.get('ADMIN_USERNAME', 'admin')
+email = os.environ.get('ADMIN_EMAIL', 'admin@beecode.com')
+password = os.environ['ADMIN_PASSWORD']
+if not CustomUser.objects.filter(username=username).exists():
+    CustomUser.objects.create_superuser(username, email, password, role='superadmin')
     print('Admin user created.')
+elif os.environ.get('ADMIN_RESET_PASSWORD', '').lower() in ('true', '1'):
+    user = CustomUser.objects.get(username=username)
+    user.email = email
+    user.role = 'superadmin'
+    user.is_staff = True
+    user.is_superuser = True
+    user.set_password(password)
+    user.save()
+    print('Admin password reset.')
 else:
-    u = CustomUser.objects.get(username='admin')
-    u.set_password('admin123')
-    u.role = 'superadmin'
-    u.save()
-    print('Admin user updated.')
+    print('Admin user already exists.')
 "
+else
+echo "ADMIN_PASSWORD is not set; skipping automatic admin creation"
+fi
 
 echo "Collect static files"
 python manage.py collectstatic --settings=config.settings.production --noinput
+fi
 
-echo "Starting server"
-exec gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-10000}
+exec "$@"

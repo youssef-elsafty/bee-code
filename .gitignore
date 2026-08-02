@@ -32,7 +32,6 @@ pnpm-debug.log*
 .pnpm-debug.log*
 
 # ── Service Worker & PWA Build Outputs ──
-frontend/public/sw.js
 frontend/public/sw.js.map
 frontend/public/workbox-*.js
 frontend/public/workbox-*.js.map

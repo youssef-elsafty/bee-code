@@ -267,14 +267,6 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        {/* Hint */}
-        <p style={{
-          textAlign: 'center', marginTop: '1.5rem',
-          fontSize: '0.75rem', color: '#4B5563',
-          lineHeight: 1.6,
-        }}>
-          للدخول التجريبي: اسم المستخدم <span style={{ color: '#F59E0B', direction: 'ltr', display: 'inline-block' }}>admin</span> وكلمة المرور <span style={{ color: '#F59E0B', direction: 'ltr', display: 'inline-block' }}>admin123</span>
-        </p>
       </div>
 
       <style>{`

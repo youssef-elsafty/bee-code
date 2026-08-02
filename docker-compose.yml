@@ -47,7 +47,6 @@ services:
       dockerfile: Dockerfile
     container_name: academy_backend
     restart: always
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 4 --threads 2 --timeout 120 --access-logfile - --error-logfile -
     env_file:
       - .env
     environment:
@@ -79,7 +78,7 @@ services:
       dockerfile: Dockerfile
     container_name: academy_celery_worker
     restart: always
-    command: celery -A core worker -l info --concurrency=4
+    command: celery -A config worker -l info --concurrency=4
     env_file:
       - .env
     environment:
@@ -104,7 +103,7 @@ services:
       dockerfile: Dockerfile
     container_name: academy_celery_beat
     restart: always
-    command: celery -A core beat -l info
+    command: celery -A config beat -l info
     env_file:
       - .env
     environment:
